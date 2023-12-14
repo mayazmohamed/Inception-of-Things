@@ -1,0 +1,1 @@
+{"virtualbox":{"/home/vagrant":{"guestpath":"/home/vagrant","hostpath":"/Users/momayaz/Desktop","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"/goinfre/momayaz/Inception-of-Things","disabled":false,"__vagrantfile":true}}}

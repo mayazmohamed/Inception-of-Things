@@ -1,24 +1,22 @@
+#!/bin/bash
+
 HOSTNAME=$(hostname)
-sudo apt update && sudo apt upgrade
+sudo apt update -y && sudo apt upgrade -y
 sudo apt-get install -y curl
-curl --version
-sudo apt-get install ufw -y
-    ufw allow 6443/tcp #apiserver
-    ufw allow from 10.42.0.0/16 to any #pods
-    ufw allow from 10.43.0.0/16 to any #services
 
-if [ "$HOSTNAME" = "momayazS" ]
-then
-    curl -sfL https://get.k3s.io | sh -
-    sudo cp /var/lib/rancher/k3s/server/node-token /home/vagrant
-fi
+echo "Hostname: $HOSTNAME"
 
-if [ "$HOSTNAME" = "iqessamSW" ]
-then
-    # scp vagrant@192.168.56.110:/var/lib/rancher/k3s/server/node-token vagrant@192.168.56.111:/home/vagrant
-    my_token=$(cat /home/vagrant/node-token | awk '{print $1}')
-    echo "my_token: $my_token"
-   # On the agent node
-   curl -sfL https://get.k3s.io | K3S_URL="https://192.168.56.110:6443" K3S_TOKEN="$my_token" sh -
-
+if [ "$HOSTNAME" = "momayazS" ]; then
+    echo "Installing k3s on momayazS..."
+    curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" INSTALL_K3S_EXEC="--flannel-iface eth1" sh -
+	  sudo cp /var/lib/rancher/k3s/server/node-token /home/vagrant
+	  sleep 10
+elif [ "$HOSTNAME" = "iqessamSW" ]; then
+    echo "Installing k3s on iqessamSW..."
+    K3S_TOKEN=$(cat /home/vagrant/node-token | awk '{print $1}')
+	  curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" INSTALL_K3S_EXEC="--flannel-iface eth1" K3S_URL=https://192.168.56.110:6443 K3S_TOKEN=${K3S_TOKEN} sh -
+	  sleep 10
+else
+    echo "Unknown hostname: $HOSTNAME"
+    exit 1
 fi
